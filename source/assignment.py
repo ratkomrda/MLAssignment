@@ -140,24 +140,24 @@ if readgroupc == 1:
     printDivision()
     print("Using the dataset provide by Sean with mods made to remove multi sensor failure entries")
 
-    df1 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/opel_corsa_01.csv', sep=";")
-    df2 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/opel_corsa_02.csv', sep=";")
-    df3 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/peugeot_207_01.csv', sep=";")
-    df4 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/peugeot_207_02.csv', sep=";")
+    df1 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/opel_corsa_01.csv', sep=";")
+    df2 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/opel_corsa_02.csv', sep=";")
+    df3 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/peugeot_207_01.csv', sep=";")
+    df4 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/peugeot_207_02.csv', sep=";")
 elif readorig == 1:
     printDivision()
     print("Using the original Kaggle dataset ")
-    df1 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/original/opel_corsa_01.csv', sep=";", decimal=',')
-    df2 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/original/opel_corsa_02.csv', sep=";", decimal=',')
-    df3 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/original/peugeot_207_01.csv', sep=";", decimal=',')
-    df4 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/original/peugeot_207_02.csv', sep=";", decimal=',')
+    df1 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/original/opel_corsa_01.csv', sep=";", decimal=',')
+    df2 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/original/opel_corsa_02.csv', sep=";", decimal=',')
+    df3 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/original/peugeot_207_01.csv', sep=";", decimal=',')
+    df4 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/original/peugeot_207_02.csv', sep=";", decimal=',')
 else:
     printDivision()
     print("Using the dataset provide by Sean unmodified")
-    df1 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/Sean/opel_corsa_01.csv', sep=";")
-    df2 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/Sean/opel_corsa_02.csv', sep=";")
-    df3 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/Sean/peugeot_207_01.csv', sep=";")
-    df4 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/Sean/peugeot_207_02.csv', sep=";")
+    df1 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/Sean/opel_corsa_01.csv', sep=";")
+    df2 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/Sean/opel_corsa_02.csv', sep=";")
+    df3 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/Sean/peugeot_207_01.csv', sep=";")
+    df4 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/Sean/peugeot_207_02.csv', sep=";")
 
 #Choose the files you want to use
 frames = [df1, df2, df3, df4]
@@ -193,7 +193,7 @@ for df in frames:
         printDivision()
 
 
-#    plotFeatures(df)
+    plotFeatures(df)
     # Add titles
     for feature_index in feature_names:
         # Find all missing or NAN values and replace with the mean as calculated for this car.
@@ -202,7 +202,7 @@ for df in frames:
         if (sum_nulls > 0):
             print(feature_index + ' has ' + str(sum_nulls) + ' nulls')
         df[feature_index].fillna(df[feature_index].mean(), inplace=True)
-#    plotHeatmap(df, 'Unscaled ' + car_variants[dataset_num] + ' Features Heatmap')
+    plotHeatmap(df, 'Unscaled ' + car_variants[dataset_num] + ' Features Heatmap')
     dataset_num += 1
     printDivision()
     # display
@@ -260,11 +260,17 @@ total_positive = np.sum(positive)
 target[negative] = 0
 total_negative = np.sum(negative)
 
+scaler = "power"
 # look at scaling
-X_scaler = PowerTransformer(method='yeo-johnson')
-#X_scaler = Normalizer()
-#X_scaler = StandardScaler(with_mean=True, with_std=True)
-#X_scaler = RobustScaler(copy=True, quantile_range=(25.0, 75.0), with_centering=True, with_scaling=True)
+if scaler == "power":
+    X_scaler = PowerTransformer(method='yeo-johnson')
+elif scaler == "norm":
+    X_scaler = Normalizer()
+elif scaler == "robo":
+    X_scaler = RobustScaler(copy=True, quantile_range=(25.0, 75.0), with_centering=True, with_scaling=True)
+else:
+    X_scaler = StandardScaler(with_mean=True, with_std=True)
+
 
 Xorig = X_scaler.fit_transform(Xorig)
 plt.plot(Xorig)
