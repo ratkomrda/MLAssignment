@@ -45,7 +45,7 @@ def benchmark(name, clf, Xtrain, ytrain, Xtest, ytest):
     accuracy = metrics.accuracy_score(ytest, ypred)
     return name, accuracy, train_duration, test_duration, ypred
 
-def printPlotMetrics(ytest, Xtest, ypred, model):
+def printPlotMetrics(title, ytest, Xtest, ypred, model):
     # The confusion matrix for the logistic regression classifier
     cnf_matrix = metrics.confusion_matrix(ytest, ypred)
     printDivision()
@@ -73,15 +73,16 @@ def printPlotMetrics(ytest, Xtest, ypred, model):
     printDivision()
 
     plt.hist(y_prediction_probability)
-    plt.title("Prediction Probability")
+    plt.title("Prediction Probability " + title)
     plt.show()
 
     fp, tp, thresholds = metrics.roc_curve(ytest, y_prediction_probability)
     plt.plot(fp, tp)
     plt.grid(True)
-    plt.title("ROC Curve")
+    plt.title("ROC Curve " + title)
     plt.show()
     print("ROC ACU Score", metrics.roc_auc_score(ytest, y_prediction_probability)) # useful even with high class imbalance
+    print("Cross Validation Score", cross_val_score(model, Xunder, yunder, cv=10, scoring='roc_auc').mean())
     printDivision()
     return
 
@@ -138,25 +139,26 @@ readgroupc = 1
 readorig = 0
 if readgroupc == 1:
     printDivision()
-    print("Using the dataset provide by Sean with nods to remove multi sensor failure entries")
-    df1 = pd.read_csv('../data/kaggle_input/opel_corsa_01.csv', sep=";")
-    df2 = pd.read_csv('../data/kaggle_input/opel_corsa_02.csv', sep=";")
-    df3 = pd.read_csv('../data/kaggle_input/peugeot_207_01.csv', sep=";")
-    df4 = pd.read_csv('../data/kaggle_input/peugeot_207_02.csv', sep=";")
+    print("Using the dataset provide by Sean with mods made to remove multi sensor failure entries")
+
+    df1 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/opel_corsa_01.csv', sep=";")
+    df2 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/opel_corsa_02.csv', sep=";")
+    df3 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/peugeot_207_01.csv', sep=";")
+    df4 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/peugeot_207_02.csv', sep=";")
 elif readorig == 1:
     printDivision()
     print("Using the original Kaggle dataset ")
-    df1 = pd.read_csv('../data/kaggle_input/original/orig_opel_corsa_01.csv', sep=";", decimal=',')
-    df2 = pd.read_csv('../data/kaggle_input/original/orig_opel_corsa_02.csv', sep=";", decimal=',')
-    df3 = pd.read_csv('../data/kaggle_input/original/orig_peugeot_207_01.csv', sep=";", decimal=',')
-    df4 = pd.read_csv('../data/kaggle_input/original/orig_peugeot_207_02.csv', sep=";", decimal=',')
+    df1 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/original/opel_corsa_01.csv', sep=";", decimal=',')
+    df2 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/original/opel_corsa_02.csv', sep=";", decimal=',')
+    df3 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/original/peugeot_207_01.csv', sep=";", decimal=',')
+    df4 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/original/peugeot_207_02.csv', sep=";", decimal=',')
 else:
     printDivision()
     print("Using the dataset provide by Sean unmodified")
-    df1 = pd.read_csv('../data/kaggle_input/Sean/opel_corsa_01.csv', sep=";")
-    df2 = pd.read_csv('../data/kaggle_input/Sean/opel_corsa_02.csv', sep=";")
-    df3 = pd.read_csv('../data/kaggle_input/Sean/peugeot_207_01.csv', sep=";")
-    df4 = pd.read_csv('../data/kaggle_input/Sean/peugeot_207_02.csv', sep=";")
+    df1 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/Sean/opel_corsa_01.csv', sep=";")
+    df2 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/Sean/opel_corsa_02.csv', sep=";")
+    df3 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/Sean/peugeot_207_01.csv', sep=";")
+    df4 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/Sean/peugeot_207_02.csv', sep=";")
 
 #Choose the files you want to use
 frames = [df1, df2, df3, df4]
@@ -174,8 +176,7 @@ if readorig != 1:
 car_variants = ['Opel_Corsa_01', 'Opel_Corsa_02', 'Peugeot_207_01', 'Peuggeot_207_02']
 dataset_num = 0
 
-
-
+dsiplay_data_plots = 0
 
 for df in frames:
     printDivision()
@@ -191,8 +192,8 @@ for df in frames:
         printDataInfo(df, feature_index)
         printDivision()
 
-
-#    plotFeatures(df)
+    if dsiplay_data_plots == 1:
+        plotFeatures(df)
     # Add titles
     for feature_index in feature_names:
         # Find all missing or NAN values and replace with the mean as calculated for this car.
@@ -201,7 +202,8 @@ for df in frames:
         if (sum_nulls > 0):
             print(feature_index + ' has ' + str(sum_nulls) + ' nulls')
         df[feature_index].fillna(df[feature_index].mean(), inplace=True)
-#    plotHeatmap(df, 'Unscaled ' + car_variants[dataset_num] + ' Features Heatmap')
+    if dsiplay_data_plots == 1:
+        plotHeatmap(df, 'Unscaled ' + car_variants[dataset_num] + ' Features Heatmap')
     dataset_num += 1
     printDivision()
     # display
@@ -222,29 +224,30 @@ data = pd.concat(frames)
 # Xorig contains all of the feature columns
 Xorig = data.iloc[:, 0:14]
 
-plt.style.use('seaborn-darkgrid')
-# create a color palette
-palette = plt.get_cmap('tab20')
-num = 0
-for column in Xorig:
-    num += 1
-    plt.plot(Xorig[column], marker='', color=palette(num), linewidth=1, alpha=0.9, label=column)
-    # Add legend
-    plt.legend(loc=2, ncol=2)
-plt.title("Unscaled Combined Features")
-plt.show()
+if dsiplay_data_plots == 1:
+    plt.style.use('seaborn-darkgrid')
+    # create a color palette
+    palette = plt.get_cmap('tab20')
+    num = 0
+    for column in Xorig:
+        num += 1
+        plt.plot(Xorig[column], marker='', color=palette(num), linewidth=1, alpha=0.9, label=column)
+        # Add legend
+        plt.legend(loc=2, ncol=2)
+    plt.title("Unscaled Combined Features")
+    plt.show()
 
 # y contains the labels for the drivingStyle class it has either
 # if you get the error IndexError: single positional indexer is out-of-bounds on this line check the delimiter
 yorig = data.iloc[:, 14]
-
-plotHeatmap(Xorig, "Unscaled Combined Features Heatmap")
+if dsiplay_data_plots == 1:
+    plotHeatmap(Xorig, "Unscaled Combined Features Heatmap")
 # Create a series of boolean values which are true for all locations in y that have the label EvenPaceStyle and false
 # otherwise
-positive = yorig == 'EvenPaceStyle'
+positive = yorig == 'AggressiveStyle'
 # Create a series of boolean values which are true for all locations in y that have the label AggressiveStyle and false
 # otherwise
-negative = yorig == 'AggressiveStyle'
+negative = yorig == 'EvenPaceStyle'
 
 # Create a new array of given shape and type, filled with zeros.
 # Create a 1D array the same length as yfilled with zeros named yinput
@@ -253,27 +256,34 @@ target = np.zeros((len(yorig), 1)).ravel()
 
 # This will set the value of yinput to 1 for the indices of positive which where had true written to them at line 36
 target[positive] = 1
-total_positive = np.sum(positive)
+total_aggressive = np.sum(positive)
 # This is unneeded as yinput was initialised with 0s but I include it for completeness. It will set the value of yinput
 # to 0 for the indices of negative that were set to true at line 39
 target[negative] = 0
-total_negative = np.sum(negative)
+total_even = np.sum(negative)
 
+scaler = "power"
 # look at scaling
-X_scaler = PowerTransformer(method='yeo-johnson')
-#X_scaler = Normalizer()
-#X_scaler = StandardScaler(with_mean=True, with_std=True)
-#X_scaler = RobustScaler(copy=True, quantile_range=(25.0, 75.0), with_centering=True, with_scaling=True)
+if scaler == "power":
+    X_scaler = PowerTransformer(method='yeo-johnson')
+elif scaler == "norm":
+    X_scaler = Normalizer()
+elif scaler == "robo":
+    X_scaler = RobustScaler(copy=True, quantile_range=(25.0, 75.0), with_centering=True, with_scaling=True)
+else:
+    X_scaler = StandardScaler(with_mean=True, with_std=True)
+
 
 Xorig = X_scaler.fit_transform(Xorig)
-plt.plot(Xorig)
-plt.title("Scaled Combined Features")
-plt.show()
+if dsiplay_data_plots == 1:
+    plt.plot(Xorig)
+    plt.title("Scaled Combined Features")
+    plt.show()
 
 printDivision()
-print('Class 0:', total_negative)
-print('Class 1:', total_positive)
-print('Proportion:', round(total_negative / total_positive, 2), ': 1')
+print('Class 0:', total_even)
+print('Class 1:', total_aggressive)
+print('Proportion:', round(total_aggressive / total_even, 2), ': 1')
 printDivision()
 
 # Split arrays or matrices into random train and test subsets
@@ -284,37 +294,38 @@ printDivision()
 #https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html
 X_train, X_test, y_train, y_test = train_test_split(Xorig, target, test_size=.4, random_state=23)
 
-# First check what the accuracy would be if Even driving is predicted everytime
+# First check what the accuracy would be if Even / Aggressive driving is predicted everytime
+# This will not work for multivariate classifier only for binary
 ones_percentage = y_test.mean()
 zeros_percentage = 1 - y_test.mean()
-# This will not work for multivariate classifier only for binary
-null_accuracy = max(ones_percentage, zeros_percentage)
 print("====================================================")
-print("Accuracy when Even driving is predicted 100%", null_accuracy)
+print("Accuracy when Aggressive driving is predicted 100%", ones_percentage)
+print("Accuracy when Even driving is predicted 100%", zeros_percentage)
 
 # Balance teh data set based on the negative class count which is fewer.
 
-df_class_0 = data[data['drivingStyle'] == 'AggressiveStyle']
-df_class_1 = data[data['drivingStyle'] == 'EvenPaceStyle']
+aggressive_class = data[data['drivingStyle'] == 'AggressiveStyle']
+even_class = data[data['drivingStyle'] == 'EvenPaceStyle']
 
 # Randomly select the number of negative samples from the positive class to balance the dataset
-df_class_1_under = df_class_1.sample(total_negative, random_state=23)
-undersampleddata = pd.concat([df_class_0, df_class_1_under], axis=0)
+even_class_undersampled = even_class.sample(total_aggressive, random_state=23)
+undersampleddata = pd.concat([aggressive_class, even_class_undersampled], axis=0)
 
 Xunder = undersampleddata.iloc[:, 0:13]
 # y contains the labels for the drivingStyle class it has either
 # if you get the error IndexError: single positional indexer is out-of-bounds on this line check the delimiter
 yunder = undersampleddata.iloc[:, 14]
-plt.plot(Xunder)
-plt.title("Under-sampled Scaled Combined Features")
-plt.show()
-plotHeatmap(Xunder, "Under-sampled Scaled Combined Features Heatmap")
+if dsiplay_data_plots == 1:
+    plt.plot(Xunder)
+    plt.title("Under-sampled Scaled Combined Features")
+    plt.show()
+    plotHeatmap(Xunder, "Under-sampled Scaled Combined Features Heatmap")
 # Create a series of boolean values which are true for all locations in y that have the label EvenPaceStyle and false
 # otherwise
-positive = yunder == 'EvenPaceStyle'
+positive = yunder == 'AggressiveStyle'
 # Create a series of boolean values which are true for all locations in y that have the label AggressiveStyle and false
 # otherwise
-negative = yunder == 'AggressiveStyle'
+negative = yunder == 'EvenPaceStyle'
 
 # Create a new array of given shape and type, filled with zeros.
 # Create a 1D array the same length as yfilled with zeros named yinput
@@ -323,15 +334,15 @@ targetunder = np.zeros((len(yunder), 1)).ravel()
 
 # This will set the value of yinput to 1 for the indices of positive which where had true written to them at line 36
 targetunder[positive] = 1
-total_positive = np.sum(positive)
+total_aggressive = np.sum(positive)
 # This is unneeded as yinput was initialised with 0s but I include it for completeness. It will set the value of yinput
 # to 0 for the indices of negative that were set to true at line 39
 targetunder[negative] = 0
-total_negative = np.sum(negative)
+total_even = np.sum(negative)
 printDivision()
-print('Class 0:', total_negative)
-print('Class 1:', total_positive)
-print('Proportion:', round(total_negative / total_positive, 2), ': 1')
+print('Class 0:', total_even)
+print('Class 1:', total_aggressive)
+print('Proportion:', round(total_aggressive / total_even, 2), ': 1')
 printDivision()
 
 
@@ -344,18 +355,20 @@ printDivision()
 X_train, X_test, y_train, y_test = train_test_split(Xunder, targetunder, test_size=.4, random_state=23)
 
 # First check what the accuracy would be if Even driving is predicted everytime
+# This will not work for multivariate classifier only for binary
 ones_percentage = y_test.mean()
 zeros_percentage = 1 - y_test.mean()
-# This will not work for multivariate classifier only for binary
-null_accuracy = max(ones_percentage, zeros_percentage)
+
 print("====================================================")
-print("Accuracy when Even driving is predicted 100%", null_accuracy)
+print("Accuracy when Aggressive driving is predicted 100% after undersampling", ones_percentage)
+print("Accuracy when Even driving is predicted 100% after undersampling", zeros_percentage)
+
 
 # Logistic Regression classifier. This class implements regularized logistic regression using the ‘liblinear’ library,
 # ‘newton-cg’, ‘sag’, ‘saga’ and ‘lbfgs’ solvers. Note that regularization is applied by default. Based on the
 # documentation which recommended liblinear for small data sets.
 # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html
-logreg = LogisticRegression(solver='liblinear')
+logreg = LogisticRegression(solver='liblinear', random_state=23)
 
 # Fit the model according to the given training data
 # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression.fit
@@ -372,12 +385,9 @@ calssifier_results.append(logresults)
 # Print and plot metrics for the classifier
 printDivision()
 print("Logistic Regression")
-printPlotMetrics(y_test, X_test, getPredictedTarget(calssifier_results), logreg)
-
+printPlotMetrics( "Logistic Regression", y_test, X_test, getPredictedTarget(calssifier_results), logreg)
 printDivision()
-#print("Logistic Regression Entire Dataset Results")
-#ypred_orig = logreg.predict(Xorig)
-#printPlotMetrics(target, Xorig, ypred_orig, logreg)
+
 
 # Random Forest classifier. A random forest is a meta estimator that fits a number of decision  tree classifiers on
 # various sub-samples of the dataset and uses averaging to improve the predictive accuracy and control over-fitting.
@@ -386,19 +396,13 @@ printDivision()
 # is a number used to initialise the random generator default=None
 # https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
 rf = RandomForestClassifier(n_estimators=200, random_state=23)
-
 calssifier_results.append(benchmark("Random Forest", rf, X_train, y_train, X_test, y_test))
-
 
 # Print and plot metrics for the classifier
 printDivision()
 print("Random Forest Results")
-printPlotMetrics(y_test, X_test, getPredictedTarget(calssifier_results), rf)
-
+printPlotMetrics("Random Forest Results", y_test, X_test, getPredictedTarget(calssifier_results), rf)
 printDivision()
-#print("Random Forest Entire Dataset Results")
-#ypred_orig = rf.predict(Xorig)
-#printPlotMetrics(target, Xorig, ypred_orig, rf)
 
 # Create a series of the the features and plot their importance
 feat_important = pd.Series(rf.feature_importances_, index=X_train.columns)
@@ -408,10 +412,11 @@ plt.barh(range(len(indices)), feat_important[indices], align='center')
 plt.yticks(range(len(indices)), [X_train.columns[i] for i in indices])
 plt.xlabel('Relative Importance')
 plt.show()
+
 # Meta-transformer for selecting features based on importance weights.
 # Reduce the Feature selection based on their importance
 # https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFromModel.html
-features = SelectFromModel(rf)
+features = SelectFromModel(rf, threshold=-np.inf, max_features=6)
 features.fit(X_train, y_train)
 
 printDivision()
@@ -423,7 +428,6 @@ for feature_list_index in features.get_support(indices=True):
 # updated
 X_train_sel = features.transform(X_train)
 X_test_sel = features.transform(X_test)
-#X_test_orig_sel = features.transform(Xorig)
 
 # Random Forest classifier. A random forest is a meta estimator that fits a number of decision  tree classifiers on
 # various sub-samples of the dataset and uses averaging to improve the predictive accuracy and control over-fitting.
@@ -437,12 +441,9 @@ calssifier_results.append(benchmark("Random Forest Reduced Features", rf_sel, X_
 
 printDivision()
 print("Random Forest Reduced Features Results")
-printPlotMetrics(y_test, X_test_sel, getPredictedTarget(calssifier_results), rf_sel)
-
+printPlotMetrics("Random Forest Reduced Features", y_test, X_test_sel, getPredictedTarget(calssifier_results), rf_sel)
 printDivision()
-#print("Random Forest Reduced Features Entire Dataset Results")
-#ypred_orig = rf_sel.predict(X_test_orig_sel)
-#printPlotMetrics(target, X_test_orig_sel, ypred_orig, rf_sel)
+
 
 indices = np.arange(len(calssifier_results))
 calssifier_results = [[x[i] for x in calssifier_results] for i in range(4)]
