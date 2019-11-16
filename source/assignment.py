@@ -45,7 +45,7 @@ def benchmark(name, clf, Xtrain, ytrain, Xtest, ytest):
     accuracy = metrics.accuracy_score(ytest, ypred)
     return name, accuracy, train_duration, test_duration, ypred
 
-def printPlotMetrics(ytest, Xtest, ypred, model):
+def printPlotMetrics(title, ytest, Xtest, ypred, model):
     # The confusion matrix for the logistic regression classifier
     cnf_matrix = metrics.confusion_matrix(ytest, ypred)
     printDivision()
@@ -73,15 +73,16 @@ def printPlotMetrics(ytest, Xtest, ypred, model):
     printDivision()
 
     plt.hist(y_prediction_probability)
-    plt.title("Prediction Probability")
+    plt.title("Prediction Probability " + title)
     plt.show()
 
     fp, tp, thresholds = metrics.roc_curve(ytest, y_prediction_probability)
     plt.plot(fp, tp)
     plt.grid(True)
-    plt.title("ROC Curve")
+    plt.title("ROC Curve " + title)
     plt.show()
     print("ROC ACU Score", metrics.roc_auc_score(ytest, y_prediction_probability)) # useful even with high class imbalance
+    print("Cross Validation Score", cross_val_score(model, Xunder, yunder, cv=10, scoring='roc_auc').mean())
     printDivision()
     return
 
@@ -175,8 +176,7 @@ if readorig != 1:
 car_variants = ['Opel_Corsa_01', 'Opel_Corsa_02', 'Peugeot_207_01', 'Peuggeot_207_02']
 dataset_num = 0
 
-
-
+dsiplay_data_plots = 0
 
 for df in frames:
     printDivision()
@@ -192,8 +192,8 @@ for df in frames:
         printDataInfo(df, feature_index)
         printDivision()
 
-
-    plotFeatures(df)
+    if dsiplay_data_plots == 1:
+        plotFeatures(df)
     # Add titles
     for feature_index in feature_names:
         # Find all missing or NAN values and replace with the mean as calculated for this car.
@@ -202,7 +202,8 @@ for df in frames:
         if (sum_nulls > 0):
             print(feature_index + ' has ' + str(sum_nulls) + ' nulls')
         df[feature_index].fillna(df[feature_index].mean(), inplace=True)
-    plotHeatmap(df, 'Unscaled ' + car_variants[dataset_num] + ' Features Heatmap')
+    if dsiplay_data_plots == 1:
+        plotHeatmap(df, 'Unscaled ' + car_variants[dataset_num] + ' Features Heatmap')
     dataset_num += 1
     printDivision()
     # display
@@ -223,23 +224,24 @@ data = pd.concat(frames)
 # Xorig contains all of the feature columns
 Xorig = data.iloc[:, 0:14]
 
-plt.style.use('seaborn-darkgrid')
-# create a color palette
-palette = plt.get_cmap('tab20')
-num = 0
-for column in Xorig:
-    num += 1
-    plt.plot(Xorig[column], marker='', color=palette(num), linewidth=1, alpha=0.9, label=column)
-    # Add legend
-    plt.legend(loc=2, ncol=2)
-plt.title("Unscaled Combined Features")
-plt.show()
+if dsiplay_data_plots == 1:
+    plt.style.use('seaborn-darkgrid')
+    # create a color palette
+    palette = plt.get_cmap('tab20')
+    num = 0
+    for column in Xorig:
+        num += 1
+        plt.plot(Xorig[column], marker='', color=palette(num), linewidth=1, alpha=0.9, label=column)
+        # Add legend
+        plt.legend(loc=2, ncol=2)
+    plt.title("Unscaled Combined Features")
+    plt.show()
 
 # y contains the labels for the drivingStyle class it has either
 # if you get the error IndexError: single positional indexer is out-of-bounds on this line check the delimiter
 yorig = data.iloc[:, 14]
-
-plotHeatmap(Xorig, "Unscaled Combined Features Heatmap")
+if dsiplay_data_plots == 1:
+    plotHeatmap(Xorig, "Unscaled Combined Features Heatmap")
 # Create a series of boolean values which are true for all locations in y that have the label EvenPaceStyle and false
 # otherwise
 positive = yorig == 'AggressiveStyle'
@@ -273,9 +275,10 @@ else:
 
 
 Xorig = X_scaler.fit_transform(Xorig)
-plt.plot(Xorig)
-plt.title("Scaled Combined Features")
-plt.show()
+if dsiplay_data_plots == 1:
+    plt.plot(Xorig)
+    plt.title("Scaled Combined Features")
+    plt.show()
 
 printDivision()
 print('Class 0:', total_even)
@@ -312,10 +315,11 @@ Xunder = undersampleddata.iloc[:, 0:13]
 # y contains the labels for the drivingStyle class it has either
 # if you get the error IndexError: single positional indexer is out-of-bounds on this line check the delimiter
 yunder = undersampleddata.iloc[:, 14]
-plt.plot(Xunder)
-plt.title("Under-sampled Scaled Combined Features")
-plt.show()
-plotHeatmap(Xunder, "Under-sampled Scaled Combined Features Heatmap")
+if dsiplay_data_plots == 1:
+    plt.plot(Xunder)
+    plt.title("Under-sampled Scaled Combined Features")
+    plt.show()
+    plotHeatmap(Xunder, "Under-sampled Scaled Combined Features Heatmap")
 # Create a series of boolean values which are true for all locations in y that have the label EvenPaceStyle and false
 # otherwise
 positive = yunder == 'AggressiveStyle'
@@ -381,7 +385,7 @@ calssifier_results.append(logresults)
 # Print and plot metrics for the classifier
 printDivision()
 print("Logistic Regression")
-printPlotMetrics(y_test, X_test, getPredictedTarget(calssifier_results), logreg)
+printPlotMetrics( "Logistic Regression", y_test, X_test, getPredictedTarget(calssifier_results), logreg)
 printDivision()
 
 
@@ -397,7 +401,7 @@ calssifier_results.append(benchmark("Random Forest", rf, X_train, y_train, X_tes
 # Print and plot metrics for the classifier
 printDivision()
 print("Random Forest Results")
-printPlotMetrics(y_test, X_test, getPredictedTarget(calssifier_results), rf)
+printPlotMetrics("Random Forest Results", y_test, X_test, getPredictedTarget(calssifier_results), rf)
 printDivision()
 
 # Create a series of the the features and plot their importance
@@ -412,7 +416,7 @@ plt.show()
 # Meta-transformer for selecting features based on importance weights.
 # Reduce the Feature selection based on their importance
 # https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectFromModel.html
-features = SelectFromModel(rf, threshold=-np.inf, max_features=5)
+features = SelectFromModel(rf, threshold=-np.inf, max_features=6)
 features.fit(X_train, y_train)
 
 printDivision()
@@ -437,7 +441,7 @@ calssifier_results.append(benchmark("Random Forest Reduced Features", rf_sel, X_
 
 printDivision()
 print("Random Forest Reduced Features Results")
-printPlotMetrics(y_test, X_test_sel, getPredictedTarget(calssifier_results), rf_sel)
+printPlotMetrics("Random Forest Reduced Features", y_test, X_test_sel, getPredictedTarget(calssifier_results), rf_sel)
 printDivision()
 
 
