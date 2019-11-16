@@ -1,0 +1,41 @@
+====================================================
+Random Forest Accuracy Results
+              precision    recall  f1-score   support
+
+  Aggressive       0.86      0.57      0.69       506
+        Even       0.91      0.98      0.94      2310
+
+    accuracy                           0.91      2816
+   macro avg       0.89      0.78      0.82      2816
+weighted avg       0.90      0.91      0.90      2816
+
+Mean squared error: 0.09
+Variance score: 0.36
+
+====================================================
+Random Forest Reduced Features Accuracy Results
+              precision    recall  f1-score   support
+
+  Aggressive       0.84      0.64      0.73       506
+        Even       0.92      0.97      0.95      2310
+
+    accuracy                           0.91      2816
+   macro avg       0.88      0.81      0.84      2816
+weighted avg       0.91      0.91      0.91      2816
+
+Mean squared error: 0.09
+Variance score: 0.41
+
+====================================================
+Logistic Regression Accuracy Results
+              precision    recall  f1-score   support
+
+   Agressive       0.50      0.05      0.10       506
+        Even       0.83      0.99      0.90      2310
+
+    accuracy                           0.82      2816
+   macro avg       0.66      0.52      0.50      2816
+weighted avg       0.77      0.82      0.76      2816
+
+Mean squared error: 0.18
+Variance score: -0.22
