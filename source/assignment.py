@@ -138,25 +138,26 @@ readgroupc = 1
 readorig = 0
 if readgroupc == 1:
     printDivision()
-    print("Using the dataset provide by Sean with nods to remove multi sensor failure entries")
-    df1 = pd.read_csv('../data/kaggle_input/opel_corsa_01.csv', sep=";")
-    df2 = pd.read_csv('../data/kaggle_input/opel_corsa_02.csv', sep=";")
-    df3 = pd.read_csv('../data/kaggle_input/peugeot_207_01.csv', sep=";")
-    df4 = pd.read_csv('../data/kaggle_input/peugeot_207_02.csv', sep=";")
+    print("Using the dataset provide by Sean with mods made to remove multi sensor failure entries")
+
+    df1 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/opel_corsa_01.csv', sep=";")
+    df2 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/opel_corsa_02.csv', sep=";")
+    df3 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/peugeot_207_01.csv', sep=";")
+    df4 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/peugeot_207_02.csv', sep=";")
 elif readorig == 1:
     printDivision()
     print("Using the original Kaggle dataset ")
-    df1 = pd.read_csv('../data/kaggle_input/original/orig_opel_corsa_01.csv', sep=";", decimal=',')
-    df2 = pd.read_csv('../data/kaggle_input/original/orig_opel_corsa_02.csv', sep=";", decimal=',')
-    df3 = pd.read_csv('../data/kaggle_input/original/orig_peugeot_207_01.csv', sep=";", decimal=',')
-    df4 = pd.read_csv('../data/kaggle_input/original/orig_peugeot_207_02.csv', sep=";", decimal=',')
+    df1 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/original/opel_corsa_01.csv', sep=";", decimal=',')
+    df2 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/original/opel_corsa_02.csv', sep=";", decimal=',')
+    df3 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/original/peugeot_207_01.csv', sep=";", decimal=',')
+    df4 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/original/peugeot_207_02.csv', sep=";", decimal=',')
 else:
     printDivision()
     print("Using the dataset provide by Sean unmodified")
-    df1 = pd.read_csv('../data/kaggle_input/Sean/opel_corsa_01.csv', sep=";")
-    df2 = pd.read_csv('../data/kaggle_input/Sean/opel_corsa_02.csv', sep=";")
-    df3 = pd.read_csv('../data/kaggle_input/Sean/peugeot_207_01.csv', sep=";")
-    df4 = pd.read_csv('../data/kaggle_input/Sean/peugeot_207_02.csv', sep=";")
+    df1 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/Sean/opel_corsa_01.csv', sep=";")
+    df2 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/Sean/opel_corsa_02.csv', sep=";")
+    df3 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/Sean/peugeot_207_01.csv', sep=";")
+    df4 = pd.read_csv('https://raw.githubusercontent.com/ratkomrda/MLAssignment/master/data/kaggle_input/Sean/peugeot_207_02.csv', sep=";")
 
 #Choose the files you want to use
 frames = [df1, df2, df3, df4]
