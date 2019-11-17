@@ -1,6 +1,6 @@
-"C:\Users\bkennedy\Linear Regression\Scripts\python.exe" "D:/Tasks N+1/AI Cert/Machine Learning/Projects/Linear Regression/source/assignment.py"
+"C:\Users\bkennedy\Linear Regression\Scripts\python.exe" "D:/Tasks N+1/Masters/Machine Learning/Projects/MLAssignment/source/assignment.py"
 ====================================================
-Using the dataset provide by Sean with nods to remove multi sensor failure entries
+Using the dataset provide by Sean with mods made to remove multi sensor failure entries
 ====================================================
 Opel_Corsa_01
 ====================================================
@@ -407,12 +407,14 @@ Median:  15.996
 ====================================================
 VehicleSpeedInstantaneous has 6 nulls
 ====================================================
+Normalizer Scaler
 ====================================================
-Class 0: 2759
-Class 1: 21011
+Class 0: 21011
+Class 1: 2759
 Proportion: 0.13 : 1
 ====================================================
 ====================================================
+Accuracy when Aggressive driving is predicted 100% 0.11800588977702987
 Accuracy when Even driving is predicted 100% 0.8819941102229701
 ====================================================
 Class 0: 2759
@@ -420,24 +422,25 @@ Class 1: 2759
 Proportion: 1.0 : 1
 ====================================================
 ====================================================
-Accuracy when Even driving is predicted 100% 0.509963768115942
+Accuracy when Aggressive driving is predicted 100% after undersampling 0.509963768115942
+Accuracy when Even driving is predicted 100% after undersampling 0.490036231884058
 ====================================================
-Train Duration: 0.048s
-Test Duration:  0.002s
+Train Duration: 0.047ms
+Test Duration:  0.000ms
 ====================================================
 Logistic Regression
 ====================================================
 Confusion Matrix
 ====================================================
-[[838 288]
- [332 750]]
+[[750 332]
+ [288 838]]
 ====================================================
 Classification Results
 ====================================================
               precision    recall  f1-score   support
 
-   Agressive       0.72      0.74      0.73      1126
-        Even       0.72      0.69      0.71      1082
+   Agressive       0.72      0.69      0.71      1082
+        Even       0.72      0.74      0.73      1126
 
     accuracy                           0.72      2208
    macro avg       0.72      0.72      0.72      2208
@@ -448,47 +451,49 @@ Mean squared error: 0.28
 ====================================================
 Variance score: -0.12
 ====================================================
-Actual Values: [0. 0. 0. 0. 0. 1. 0. 0. 0. 1. 0. 0. 1. 1. 1. 0. 0. 0. 0. 0.]
-Predicted Values [1. 0. 1. 1. 1. 1. 0. 0. 1. 0. 1. 1. 0. 1. 1. 0. 1. 1. 0. 0.]
+Actual Values: [1. 1. 1. 1. 1. 0. 1. 1. 1. 0. 1. 1. 0. 0. 0. 1. 1. 1. 1. 1.]
+Predicted Values [0. 1. 0. 0. 0. 0. 1. 1. 0. 1. 0. 0. 1. 0. 0. 1. 0. 0. 1. 1.]
 ====================================================
-Prediction Probability [0.57309745 0.47762146 0.83067031 ... 0.35995787 0.76892934 0.49603139]
+Prediction Probability [0.42677996 0.52259646 0.16930806 ... 0.64023933 0.23116505 0.50400781]
 ====================================================
-ROC ACU Score 0.7813075582025262
+ROC ACU Score 0.7813256156778284
+Cross Validation Score 0.7388812384022387
 ====================================================
 ====================================================
 ====================================================
-Train Duration: 1.270s
-Test Duration:  0.076s
+Train Duration: 1.219ms
+Test Duration:  0.078ms
 ====================================================
 Random Forest Results
 ====================================================
 Confusion Matrix
 ====================================================
-[[1029   97]
- [ 178  904]]
+[[ 905  177]
+ [ 100 1026]]
 ====================================================
 Classification Results
 ====================================================
               precision    recall  f1-score   support
 
-   Agressive       0.85      0.91      0.88      1126
-        Even       0.90      0.84      0.87      1082
+   Agressive       0.90      0.84      0.87      1082
+        Even       0.85      0.91      0.88      1126
 
-    accuracy                           0.88      2208
-   macro avg       0.88      0.87      0.88      2208
-weighted avg       0.88      0.88      0.88      2208
+    accuracy                           0.87      2208
+   macro avg       0.88      0.87      0.87      2208
+weighted avg       0.88      0.87      0.87      2208
 
 ====================================================
-Mean squared error: 0.12
+Mean squared error: 0.13
 ====================================================
 Variance score: 0.50
 ====================================================
-Actual Values: [0. 0. 0. 0. 0. 1. 0. 0. 0. 1. 0. 0. 1. 1. 1. 0. 0. 0. 0. 0.]
-Predicted Values [0. 1. 1. 1. 0. 1. 0. 0. 0. 1. 0. 1. 0. 1. 1. 0. 1. 0. 0. 0.]
+Actual Values: [1. 1. 1. 1. 1. 0. 1. 1. 1. 0. 1. 1. 0. 0. 0. 1. 1. 1. 1. 1.]
+Predicted Values [1. 0. 0. 0. 1. 0. 1. 1. 1. 0. 1. 0. 1. 0. 0. 1. 0. 1. 1. 1.]
 ====================================================
-Prediction Probability [0.295 0.65  0.61  ... 0.075 0.93  0.7  ]
+Prediction Probability [0.705 0.35  0.39  ... 0.925 0.07  0.3  ]
 ====================================================
 ROC ACU Score 0.9426424816880785
+Cross Validation Score 0.8160391265377612
 ====================================================
 ====================================================
 ====================================================
@@ -497,39 +502,41 @@ VehicleSpeedInstantaneous
 VehicleSpeedAverage
 VehicleSpeedVariance
 LongitudinalAcceleration
+EngineRPM
 VerticalAcceleration
 ====================================================
-Train Duration: 1.090s
-Test Duration:  0.077s
+Train Duration: 1.094ms
+Test Duration:  0.078ms
 ====================================================
 Random Forest Reduced Features Results
 ====================================================
 Confusion Matrix
 ====================================================
-[[1011  115]
- [ 212  870]]
+[[ 882  200]
+ [ 122 1004]]
 ====================================================
 Classification Results
 ====================================================
               precision    recall  f1-score   support
 
-   Agressive       0.83      0.90      0.86      1126
-        Even       0.88      0.80      0.84      1082
+   Agressive       0.88      0.82      0.85      1082
+        Even       0.83      0.89      0.86      1126
 
     accuracy                           0.85      2208
-   macro avg       0.85      0.85      0.85      2208
-weighted avg       0.85      0.85      0.85      2208
+   macro avg       0.86      0.85      0.85      2208
+weighted avg       0.86      0.85      0.85      2208
 
 ====================================================
 Mean squared error: 0.15
 ====================================================
-Variance score: 0.41
+Variance score: 0.42
 ====================================================
-Actual Values: [0. 0. 0. 0. 0. 1. 0. 0. 0. 1. 0. 0. 1. 1. 1. 0. 0. 0. 0. 0.]
-Predicted Values [0. 0. 1. 0. 0. 1. 0. 0. 0. 1. 0. 1. 0. 1. 1. 0. 1. 0. 1. 1.]
+Actual Values: [1. 1. 1. 1. 1. 0. 1. 1. 1. 0. 1. 1. 0. 0. 0. 1. 1. 1. 1. 1.]
+Predicted Values [1. 0. 0. 1. 1. 0. 1. 1. 1. 0. 0. 0. 1. 0. 0. 1. 1. 1. 0. 1.]
 ====================================================
-Prediction Probability [0.23  0.33  0.755 ... 0.    0.95  0.605]
+Prediction Probability [0.8   0.5   0.17  ... 0.985 0.025 0.42 ]
 ====================================================
-ROC ACU Score 0.9272308369147326
+ROC ACU Score 0.9247130503015598
+Cross Validation Score 0.8160391265377612
 ====================================================
 ====================================================

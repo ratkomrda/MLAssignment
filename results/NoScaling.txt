@@ -407,7 +407,7 @@ Median:  15.996
 ====================================================
 VehicleSpeedInstantaneous has 6 nulls
 ====================================================
-Robust Scaler
+No Scaling
 ====================================================
 Class 0: 21011
 Class 1: 2759
@@ -461,8 +461,8 @@ Cross Validation Score 0.7388812384022387
 ====================================================
 ====================================================
 ====================================================
-Train Duration: 1.281ms
-Test Duration:  0.078ms
+Train Duration: 1.172ms
+Test Duration:  0.062ms
 ====================================================
 Random Forest Results
 ====================================================
@@ -505,7 +505,7 @@ LongitudinalAcceleration
 EngineRPM
 VerticalAcceleration
 ====================================================
-Train Duration: 1.219ms
+Train Duration: 1.141ms
 Test Duration:  0.094ms
 ====================================================
 Random Forest Reduced Features Results
