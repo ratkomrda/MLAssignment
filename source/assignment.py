@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from time import time
+import time as time
 from sklearn.feature_selection import SelectFromModel
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split, cross_val_score
@@ -28,20 +28,20 @@ def getPredictedTarget(results):
 
 def benchmark(name, clf, Xtrain, ytrain, Xtest, ytest):
     # Get the current time
-    t0 = time()
+    t0 = time.process_time()
     # Train the classifier
     clf.fit(Xtrain, ytrain)
     # The difference between the time now and t0 is the time taken to train the classifier
-    train_duration = time() - t0
+    train_duration = time.process_time() - t0
     printDivision()
-    print("Train Duration: %0.3fs" % train_duration)
+    print("Train Duration: %0.3fms" % train_duration)
     # Get the current time
-    t0 = time()
+    t0 = time.process_time()
     # Test the classifier by using the model on the training data and returning the results
     ypred = clf.predict(Xtest)
     # The difference between the time now and t0 is the time taken to test the classifier
-    test_duration = time() - t0
-    print("Test Duration:  %0.3fs" % test_duration)
+    test_duration = time.process_time() - t0
+    print("Test Duration:  %0.3fms" % test_duration)
     # Calculate the accuracy
     accuracy = metrics.accuracy_score(ytest, ypred)
     return name, accuracy, train_duration, test_duration, ypred
@@ -131,17 +131,39 @@ def printDataInfo(dataFrame, featureName):
     print('Median:  %0.3f' % dataFrame[featureName].median())
     return
 
+
+def scaleData(X, scaler):
+    X = scaler.fit_transform(X)
+    if dsiplay_data_plots == 1:
+        plt.plot(Xorig)
+        plt.title("Scaled Combined Features")
+        plt.show()
+    return X
+
 # This function reads comma-separated values (csv) file into a DataFrame.
 # As my data is stored in a folder inside the project one folder up form the source I use ..\ to navigate out od source
 # then \data\ to get inside the data folder. It has a sub folder kaggle_input. The csv files use I have used either use
 # , or a ; as a delimiter
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
+
+# Options for running the code scaler can take the values "power" PowerTransformer(method='yeo-johnson'), "norm" Normalizer()
+# "robo" RobustScaler, or "standard" StandardScaler(with_mean=True, with_std=True)
+scaler = "power"
+# readgroupc if set to 1 it reads the data modified by group C to remove multiple sendor failures. If it and readorig are 0 then
+# the dataset provided by Sean is read in
 readgroupc = 1
+# readorig if set to 1  and readgroupc is 0 it reads the original Kaggle dataset. If it and readgroupc are 0 then
+# the dataset provided by Sean is read in
 readorig = 0
+# dsiplay_data_plots if this is 1 heatmaps and line plots of the datasets are drawn this was used to analysis the data before
+# cleaning and while scalingif its 0 then the data plots are turned off
+dsiplay_data_plots = 0
+# dont dispay the feature importance barchart if this is 0 do if it is1
+display_features = 0
+
 if readgroupc == 1:
     printDivision()
     print("Using the dataset provide by Sean with mods made to remove multi sensor failure entries")
-
     df1 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/opel_corsa_01.csv', sep=";")
     df2 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/opel_corsa_02.csv', sep=";")
     df3 = pd.read_csv('https://raw.githubusercontent.com/GreenKayBee/MLAssignment/master/data/kaggle_input/peugeot_207_01.csv', sep=";")
@@ -176,8 +198,6 @@ if readorig != 1:
 # style
 car_variants = ['Opel_Corsa_01', 'Opel_Corsa_02', 'Peugeot_207_01', 'Peuggeot_207_02']
 dataset_num = 0
-
-dsiplay_data_plots = 0
 
 for df in frames:
     printDivision()
@@ -263,23 +283,26 @@ total_aggressive = np.sum(positive)
 target[negative] = 0
 total_even = np.sum(negative)
 
-scaler = "power"
+
 # look at scaling
 if scaler == "power":
+    print("Power Transform Scaler")
     X_scaler = PowerTransformer(method='yeo-johnson')
+    Xorig = scaleData(Xorig, X_scaler)
 elif scaler == "norm":
+    print("Normalizer Scaler")
     X_scaler = Normalizer()
+    Xorig = scaleData(Xorig, X_scaler)
 elif scaler == "robo":
+    print("Robust Scaler")
     X_scaler = RobustScaler(copy=True, quantile_range=(25.0, 75.0), with_centering=True, with_scaling=True)
-else:
+    Xorig = scaleData(Xorig, X_scaler)
+elif scaler == "standard":
+    print("Standard Scaler")
     X_scaler = StandardScaler(with_mean=True, with_std=True)
-
-
-Xorig = X_scaler.fit_transform(Xorig)
-if dsiplay_data_plots == 1:
-    plt.plot(Xorig)
-    plt.title("Scaled Combined Features")
-    plt.show()
+    Xorig = scaleData(Xorig, X_scaler)
+else:
+    print("No Scaling")
 
 printDivision()
 print('Class 0:', total_even)
@@ -370,7 +393,8 @@ print("Accuracy when Even driving is predicted 100% after undersampling", zeros_
 # documentation which recommended liblinear for small data sets.
 # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html
 logreg = LogisticRegression(solver='liblinear', random_state=23)
-
+# let the program rest to see if this will give more accurate timing results
+time.sleep(10)
 # Fit the model according to the given training data
 # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression.fit
 #logreg.fit(X_train, y_train)
@@ -389,7 +413,8 @@ print("Logistic Regression")
 printPlotMetrics( "Logistic Regression", y_test, X_test, getPredictedTarget(calssifier_results), logreg)
 printDivision()
 
-
+# let the program rest to see if this will give more accurate timing results
+time.sleep(10)
 # Random Forest classifier. A random forest is a meta estimator that fits a number of decision  tree classifiers on
 # various sub-samples of the dataset and uses averaging to improve the predictive accuracy and control over-fitting.
 # The sub-sample size is always the same as the original input sample size but the samples are drawn with replacement
@@ -397,7 +422,8 @@ printDivision()
 # is a number used to initialise the random generator default=None
 # https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
 rf = RandomForestClassifier(n_estimators=200, random_state=23)
-calssifier_results.append(benchmark("Random Forest", rf, X_train, y_train, X_test, y_test))
+rf_results = benchmark("Random Forest", rf, X_train, y_train, X_test, y_test)
+calssifier_results.append(rf_results)
 
 # Print and plot metrics for the classifier
 printDivision()
@@ -405,14 +431,15 @@ print("Random Forest Results")
 printPlotMetrics("Random Forest Results", y_test, X_test, getPredictedTarget(calssifier_results), rf)
 printDivision()
 
-# Create a series of the the features and plot their importance
-feat_important = pd.Series(rf.feature_importances_, index=X_train.columns)
-indices = np.argsort(feat_important)[-9:]  # top 10 features
-plt.title('Feature Importances')
-plt.barh(range(len(indices)), feat_important[indices], align='center')
-plt.yticks(range(len(indices)), [X_train.columns[i] for i in indices])
-plt.xlabel('Relative Importance')
-plt.show()
+if display_features == 1:
+    # Create a series of the the features and plot their importance
+    feat_important = pd.Series(rf.feature_importances_, index=X_train.columns)
+    indices = np.argsort(feat_important)[-9:]  # top 10 features
+    plt.title('Feature Importances')
+    plt.barh(range(len(indices)), feat_important[indices], align='center')
+    plt.yticks(range(len(indices)), [X_train.columns[i] for i in indices])
+    plt.xlabel('Relative Importance')
+    plt.show()
 
 # Meta-transformer for selecting features based on importance weights.
 # Reduce the Feature selection based on their importance
@@ -429,7 +456,8 @@ for feature_list_index in features.get_support(indices=True):
 # updated
 X_train_sel = features.transform(X_train)
 X_test_sel = features.transform(X_test)
-
+# let the program rest to see if this will give more accurate timing results
+time.sleep(10)
 # Random Forest classifier. A random forest is a meta estimator that fits a number of decision  tree classifiers on
 # various sub-samples of the dataset and uses averaging to improve the predictive accuracy and control over-fitting.
 # The sub-sample size is always the same as the original input sample size but the samples are drawn with replacement
@@ -437,16 +465,16 @@ X_test_sel = features.transform(X_test)
 # is a number used to initialise the random generator default=None
 # https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
 rf_sel = RandomForestClassifier(n_estimators=200, random_state=23)
-
-calssifier_results.append(benchmark("Random Forest Reduced Features", rf_sel, X_train_sel, y_train, X_test_sel, y_test))
+rf_sel_results = benchmark("Random Forest Reduced Features", rf_sel, X_train_sel, y_train, X_test_sel, y_test)
+calssifier_results.append(rf_sel_results)
 
 printDivision()
 print("Random Forest Reduced Features Results")
 printPlotMetrics("Random Forest Reduced Features", y_test, X_test_sel, getPredictedTarget(calssifier_results), rf_sel)
 printDivision()
 # save the model to disk
-filename = 'random_forrest_sel.sav'
-pickle.dump(rf_sel, open(filename, 'wb'))
+#filename = 'random_forrest_sel.sav'
+#pickle.dump(rf_sel, open(filename, 'wb'))
 
 indices = np.arange(len(calssifier_results))
 calssifier_results = [[x[i] for x in calssifier_results] for i in range(4)]
