@@ -11,6 +11,7 @@ from sklearn import metrics
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import RobustScaler, StandardScaler, PowerTransformer, Normalizer
 import math
+import pickle
 
 def printDivision():
     print("====================================================")
@@ -443,7 +444,9 @@ printDivision()
 print("Random Forest Reduced Features Results")
 printPlotMetrics("Random Forest Reduced Features", y_test, X_test_sel, getPredictedTarget(calssifier_results), rf_sel)
 printDivision()
-
+# save the model to disk
+filename = 'random_forrest_sel.sav'
+pickle.dump(rf_sel, open(filename, 'wb'))
 
 indices = np.arange(len(calssifier_results))
 calssifier_results = [[x[i] for x in calssifier_results] for i in range(4)]
